@@ -1,13 +1,19 @@
 import express, { type Express } from "express";
 import authRoutes from "./modules/auth.routes.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 const app: Express = express();
 
-
-
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 app.get("/health", (_req, res) => {
   res.status(200).json({
