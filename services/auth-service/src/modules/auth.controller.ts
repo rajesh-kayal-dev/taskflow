@@ -76,10 +76,6 @@ export const login = async (req: Request, res: Response) => {
 
 export const refresh = async (req: Request, res: Response) => {
     try {
-        console.log(
-            "Refresh cookie received:",
-            Boolean(req.cookies?.[process.env.COOKIE_NAME!])
-        );
 
         const token = req.cookies?.[process.env.COOKIE_NAME!];
 
