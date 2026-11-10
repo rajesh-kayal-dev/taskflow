@@ -2,13 +2,16 @@
   "name": "taskflow",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "author": "rajesh",
   "scripts": {
     "dev": "pnpm -r --parallel --if-present dev",
     "build": "pnpm -r --if-present build",
     "typecheck": "pnpm -r --if-present typecheck",
-    "clean": "pnpm -r --if-present clean"
+    "clean": "pnpm -r --if-present clean",
+    "test": "pnpm -r --if-present test",
+    "test:coverage": "pnpm -r --if-present test:coverage"
   },
-  "author": "rajesh",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -16,10 +19,14 @@
       "onFail": "download"
     }
   },
-  "type": "module",
   "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.1.0",
+    "supertest": "^7.3.2",
     "tsx": "^4.23.15",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
   },
   "engines": {
     "node": ">=24.0.0",

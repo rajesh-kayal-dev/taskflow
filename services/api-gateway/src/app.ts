@@ -12,24 +12,29 @@ import { errorMiddleware } from "./middleware/error.middleware.js";
 import { authProxy } from "./proxy/auth.proxy.js";
 import { taskProxy } from "./proxy/task.proxy.js";
 
-import { generalRateLimiter, authRateLimiter } from "./middleware/rate-limit.middleware.js";
+import {
+  generalRateLimiter,
+  authRateLimiter,
+} from "./middleware/rate-limit.middleware.js";
 
 const app: Express = express();
 
-//Security headers
+// Security headers
 app.use(helmet());
 
-//Generate unique request ID
+// Generate unique request ID
 app.use(requestIdMiddleware);
 
-//HTTP request logging
-app.use(
-  pinoHttp({
-    logger,
-    genReqId: (req) =>
-      req.headers["x-request-id"]?.toString() ?? "unknown",
-  }),
-);
+// HTTP request logging (disabled during tests)
+if (env.NODE_ENV !== "test") {
+  app.use(
+    pinoHttp({
+      logger,
+      genReqId: (req) =>
+        req.headers["x-request-id"]?.toString() ?? "unknown",
+    }),
+  );
+}
 
 // CORS
 app.use(
@@ -41,7 +46,6 @@ app.use(
 
 // General rate limit
 app.use(generalRateLimiter);
-
 
 // Authentication rate limit
 app.use("/api/v1/auth", authRateLimiter);
@@ -69,6 +73,5 @@ app.use((_req, res) => {
 
 // Centralized error handling
 app.use(errorMiddleware);
-
 
 export default app;
