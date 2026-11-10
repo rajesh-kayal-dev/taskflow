@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { loginUser } from "../services/auth.service";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
+import axios from "axios";
+
+import { loginUser } from "../services/auth.service";
+import { useAuth } from "../../../context/useAuth";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -39,10 +40,11 @@ function LoginForm() {
 
       login(response.user, response.accessToken);
       navigate("/dashboard");
-
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.message || "Invalid email or password.");
+        setError(
+          error.response?.data?.message || "Invalid email or password."
+        );
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -57,6 +59,7 @@ function LoginForm() {
         <label htmlFor="email" className="mb-2 block text-sm font-medium">
           Email address
         </label>
+
         <input
           id="email"
           type="email"
@@ -73,6 +76,7 @@ function LoginForm() {
           <label htmlFor="password" className="text-sm font-medium">
             Password
           </label>
+
           <button
             type="button"
             className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
