@@ -168,6 +168,7 @@ function LandingPage() {
               <h2 className="text-2xl font-bold">
                 Everything you need to stay organized
               </h2>
+
               <p className="mt-3 text-sm text-gray-500">
                 Simple tools to help you get things done.
               </p>
@@ -177,7 +178,9 @@ function LandingPage() {
               {features.map(({ icon: Icon, title, description }) => (
                 <div key={title}>
                   <Icon size={24} className="text-indigo-600" />
+
                   <h3 className="mt-4 font-semibold">{title}</h3>
+
                   <p className="mt-2 text-sm leading-6 text-gray-500">
                     {description}
                   </p>
@@ -190,7 +193,7 @@ function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-100 px-6 py-6 text-center text-xs text-gray-400">
-        © 2026 TaskFlow. Simple work. Clear progress.
+        © {new Date().getFullYear()} TaskFlow. Simple work. Clear progress.
       </footer>
 
       {/* Authentication Modal */}

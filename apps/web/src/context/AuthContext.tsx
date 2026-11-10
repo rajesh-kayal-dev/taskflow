@@ -1,76 +1,59 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+
 import { refreshAccessToken } from "../features/auth/services/auth.service";
+import { AuthContext, type User } from "./auth.context";
 
-interface User {
-    id: string;
-    email: string;
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
-interface AuthContextType {
-    user: User | null;
-    accessToken: string | null;
-    isLoading: boolean; 
-    login: (user: User, accessToken: string) => void;
-    logout: () => void;
-}
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-const AuthContext = createContext<AuthContextType | null>(null);
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const savedUser = sessionStorage.getItem("user");
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+        if (!savedUser) return;
 
-    useEffect(() => {
-        const restoreSession = async () => {
-            try {
-                const savedUser = sessionStorage.getItem("user");
+        const response = await refreshAccessToken();
 
-                if (!savedUser) return;
+        setUser(JSON.parse(savedUser) as User);
+        setAccessToken(response.accessToken);
+      } catch (error) {
+        console.error("Session restoration failed:", error);
 
-                const response = await refreshAccessToken();
-
-                setUser(JSON.parse(savedUser));
-                setAccessToken(response.accessToken);
-            } catch {
-                sessionStorage.removeItem("user");
-                setUser(null);
-                setAccessToken(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        restoreSession();
-    }, []);
-
-    const login = (user: User, accessToken: string) => {
-        setUser(user);
-        setAccessToken(accessToken);
-        sessionStorage.setItem("user", JSON.stringify(user));
-    };
-
-    const logout = () => {
+        sessionStorage.removeItem("user");
         setUser(null);
         setAccessToken(null);
-        sessionStorage.removeItem("user");
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    return (
-        <AuthContext.Provider
-            value={{ user, accessToken, isLoading, login, logout }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
-}
+    void restoreSession();
+  }, []);
 
-export function useAuth() {
-    const context = useContext(AuthContext);
+  const login = (user: User, accessToken: string) => {
+    setUser(user);
+    setAccessToken(accessToken);
+    sessionStorage.setItem("user", JSON.stringify(user));
+  };
 
-    if (!context) {
-        throw new Error("useAuth must be used inside AuthProvider");
-    }
+  const logout = () => {
+    setUser(null);
+    setAccessToken(null);
+    sessionStorage.removeItem("user");
+  };
 
-    return context;
+  return (
+    <AuthContext.Provider
+      value={{ user, accessToken, isLoading, login, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
