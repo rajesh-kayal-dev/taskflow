@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["task_service"]
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+
+  @@schema("task_service")
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@schema("task_service")
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  userId      String
+  title       String       @db.VarChar(150)
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([userId, createdAt])
+  @@schema("task_service")
+}
