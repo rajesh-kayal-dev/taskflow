@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: task-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: task-service
+
+  template:
+    metadata:
+      labels:
+        app: task-service
+
+    spec:
+      hostAliases:
+        - ip: "192.168.65.254"
+          hostnames:
+            - "host.docker.internal"
+
+      containers:
+        - name: task-service
+          image: taskflow-task-service:v1
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 4002
+
+          env:
+            - name: NODE_ENV
+              value: "production"
+
+            - name: PORT
+              value: "4002"
+
+          envFrom:
+            - secretRef:
+                name: task-service-secret
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4002
+            initialDelaySeconds: 15
+            periodSeconds: 20

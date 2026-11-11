@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: api-gateway
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: api-gateway
+
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+
+    spec:
+      containers:
+        - name: api-gateway
+          image: taskflow-api-gateway:v1
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 4000
+              name: http
+
+          env:
+            - name: NODE_ENV
+              value: "development"
+            - name: PORT
+              value: "4000"
+            - name: FRONTEND_URL
+              value: "http://localhost:5173"
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:4001"
+            - name: TASK_SERVICE_URL
+              value: "http://task-service:4002"
+            - name: REQUEST_TIMEOUT_MS
+              value: "5000"
+            - name: RATE_LIMIT_WINDOW_MS
+              value: "60000"
+            - name: RATE_LIMIT_MAX_REQUESTS
+              value: "100"
+            - name: AUTH_RATE_LIMIT_MAX_REQUESTS
+              value: "10"
